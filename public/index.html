@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A zero-dependency agent lab showing why decisions, memory, tools, guardrails, and feedback are each required.">
+  <title>Agent Stack Lab — An AI Agent Is Not A Single Prompt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;700&family=Source+Code+Pro:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+<!-- pb-shell --><link rel="stylesheet" href="./pb-shell.css"><!-- pb-shell --><!-- pb-back --><link rel="stylesheet" href="./pb-back.css"><!-- pb-back -->
+</head>
+<body>
+<a class="skip-link" href="#lab-main">Skip to lab</a>
+<main id="lab-main">
+  <nav aria-label="Primary"><a aria-current="page" href="/">Lab</a><a href="/guide.html">Guide</a><a href="https://github.com/anhquanbd2021/an-ai-agent-is-not-a-single-prompt-it-is-a">Source</a></nav>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Agent Stack Lab · five layers, one failure mode</p>
+      <h1>One missing layer.<br>The agent still breaks.</h1>
+      <p class="lede">A travel-assistant agent ran the same request four times. With every layer enabled, it completed the task or blocked it for the right reason. Turn off one layer and the same request predictably fails — sometimes by completing an action it should have refused.</p>
+    </div>
+    <p class="warning"><strong>Educational model.</strong> This lab runs a deterministic simulation in the browser; no real bookings, payments, or API keys are involved.</p>
+  </header>
+
+  <section class="panel controls" aria-labelledby="controls-title">
+    <div class="section-heading"><div><p class="eyebrow">Request</p><h2 id="controls-title">Run configuration</h2></div></div>
+    <label class="control">
+      <span>Task</span>
+      <select id="task-select" aria-label="Task">
+        <option value="refund">Process a refund</option>
+        <option value="refund_over_limit">Refund an over-limit charge</option>
+        <option value="search">Find an alternative flight</option>
+        <option value="upgrade">Confirm an upgrade</option>
+      </select>
+    </label>
+    <fieldset aria-label="Layer controls">
+      <legend>Disable layers</legend>
+      <div class="toggle-row" id="layer-toggles"></div>
+    </fieldset>
+    <button id="run-task" type="button">Run agent</button>
+  </section>
+
+  <section class="workspace" aria-label="Agent run workspace">
+    <section class="panel" aria-labelledby="result-title">
+      <div class="section-heading"><div><p class="eyebrow">Live trace</p><h2 id="result-title">What happened</h2></div><span id="outcome-badge" class="badge" role="status" aria-live="polite">ready</span></div>
+      <div id="outcome-panel" class="outcome" hidden>
+        <h2></h2>
+        <p></p>
+        <div class="evidence"></div>
+      </div>
+      <ol id="step-list" class="steps" aria-label="Layer trace"></ol>
+    </section>
+    <section class="panel" aria-labelledby="layers-title">
+      <div class="section-heading"><div><p class="eyebrow">Stack</p><h2 id="layers-title">Layer map</h2></div></div>
+      <div id="summary-grid" class="summary-grid"></div>
+    </section>
+  </section>
+
+  <p class="closing-links"><a href="/guide.html">Read the layer-by-layer guide</a><span class="sep" aria-hidden="true">·</span><a href="https://github.com/anhquanbd2021/an-ai-agent-is-not-a-single-prompt-it-is-a">Inspect source and tests</a></p>
+</main>
+<script type="module" src="/app.js"></script>
+<!-- pb-shell --><a class="pb-shell" href="https://github.com/anhquanbd2021/an-ai-agent-is-not-a-single-prompt-it-is-a" title="an-ai-agent-is-not-a-single-prompt-it-is-a — an Article Playbook demo (view source)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="2" width="9" height="9" rx="2" fill="#5eead4"/><rect x="13" y="2" width="9" height="9" rx="2" fill="#5eead4" opacity=".45"/><rect x="2" y="13" width="9" height="9" rx="2" fill="#5eead4" opacity=".55"/><rect x="13" y="13" width="9" height="9" rx="4.5" fill="#5eead4"/></svg><b>an-ai-agent-is-not-a-single-prompt-it-is-a</b><i>DEMO</i></a><!-- pb-shell --><!-- pb-back --><a class="pb-back" id="pb-back" href="https://github.com/anhquanbd2021/an-ai-agent-is-not-a-single-prompt-it-is-a" title="Back to the article — an-ai-agent-is-not-a-single-prompt-it-is-a">← Article <i>PLAYBOOK</i></a><!-- pb-back -->
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "an-ai-agent-is-not-a-single-prompt-it-is-a-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent Stack Lab — companion interactive demo",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node app/server.js",
+    "test": "node --test \"test/*.test.mjs\"",
+    "check": "npm test"
+  }
+}

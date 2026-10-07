@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Guide to the Agent Stack Lab — what each layer proves and what a missing layer looks like.">
+<title>Agent Stack Lab Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;700&family=Source+Code+Pro:wght@400;600&display=swap">
+<link rel="stylesheet" href="/styles.css">
+<!-- pb-shell --><link rel="stylesheet" href="./pb-shell.css"><!-- pb-shell --><!-- pb-back --><link rel="stylesheet" href="./pb-back.css"><!-- pb-back -->
+</head>
+<body>
+<a class="skip-link" href="#guide-main">Skip to guide</a>
+<main id="guide-main">
+  <nav aria-label="Primary"><a href="/">Lab</a><a aria-current="page" href="/guide.html">Guide</a><a href="https://github.com/anhquanbd2021/an-ai-agent-is-not-a-single-prompt-it-is-a">Source</a></nav>
+
+  <header class="guide-intro">
+    <p class="eyebrow">Layer-by-layer guide</p>
+    <h1>Five layers, one predictable break</h1>
+    <p class="lede">Each toggle on the lab page controls a real contract in the simulated agent. This guide maps those contracts to the exact failure mode they prevent — and to the evidence the lab shows when one is removed.</p>
+    <p class="warning"><strong>Honest limits.</strong> The simulation is deliberately small. Real agents overlap layers in messy ways; this lab isolates the missing-contract failure so you can see it clearly.</p>
+  </header>
+
+  <section class="panel">
+    <p class="eyebrow">Start here</p>
+    <h2>What this demo proves</h2>
+    <p>Run the same task with all five layers enabled, then disable one layer at a time. Every layer contributes a deterministic step: goal routing, working context, tool call, validation, and user-facing feedback. Remove any one of them and the same request predictably fails.</p>
+    <p><a class="try" href="/">Open the lab</a></p>
+  </section>
+
+  <section class="guide-section">
+    <p class="eyebrow">The five</p>
+    <h2>Cards and missing contracts</h2>
+    <div class="control-grid">
+      <article class="panel control"><span class="control-number">Layer 01</span><h3>Decision</h3><p>Maps user intent to one tool goal and success criteria. Without it, the agent guesses — often calling search instead of a refund tool.</p><dl><dt>Proves</dt><dd>the agent routes refunds, searches, and upgrades to the right tool</dd><dt>Key detail</dt><dd>this layer chooses <code>RefundApi.refund_booking</code>, <code>SearchFlights.search</code>, or <code>BookingApi.confirm_upgrade</code></dd></dl></article>
+      <article class="panel control"><span class="control-number">Layer 02</span><h3>Memory</h3><p>Holds working state like <code>booking_id</code>, origin, and destination between layers. Without it, the agent asks for data the user already gave.</p><dl><dt>Proves</dt><dd>later layers can read the exact booking and trip identifiers</dd><dt>Key detail</dt><dd>memory stores booking_id, currency, and a short history of context</dd></dl></article>
+      <article class="panel control"><span class="control-number">Layer 03</span><h3>Tools</h3><p>Executes deterministic services and returns concrete payloads. Tools obey; they do not judge — safety is not their job.</p><dl><dt>Proves</dt><dd>a refund, search, or upgrade request produces an executable payload</dd><dt>Key detail</dt><dd>the refund tool always issues what it is told — that is the point</dd></dl></article>
+      <article class="panel control"><span class="control-number">Layer 04</span><h3>Guardrails</h3><p>Validates budget, routing, and side-effect constraints before completing the action. Without it, the agent executes unsafe operations.</p><dl><dt>Proves</dt><dd>refunds respect the $2,000 limit and the chosen tool matches the request</dd><dt>Key detail</dt><dd>a $4,200 refund is blocked here — and ships when this layer is off</dd></dl></article>
+      <article class="panel control"><span class="control-number">Layer 05</span><h3>Feedback</h3><p>Returns outcome status, evidence, and a user-facing message. Without it, failures stay silent.</p><dl><dt>Proves</dt><dd>the agent reports completed, blocked, or escalated outcomes</dd><dt>Key detail</dt><dd>every run ends in a message, never a dead end</dd></dl></article>
+    </div>
+  </section>
+
+  <section class="guide-section panel">
+    <p class="eyebrow">Architecture</p>
+    <h2>How the lab maps to real systems</h2>
+    <div class="table-wrap panel" tabindex="0" role="region" aria-label="Architecture table">
+      <table>
+        <thead><tr><th>Layer</th><th>Real-world contract</th><th>Lab behavior when missing</th></tr></thead>
+        <tbody>
+          <tr><td>Decision</td><td>Goal schema, intent classifier, allowed tool routing</td><td>agent has no goal contract and escalates</td></tr>
+          <tr><td>Memory</td><td>short-term state, conversation context, identifiers</td><td>re-asks for booking_id on the same turn</td></tr>
+          <tr><td>Tools</td><td>typed APIs, schemas, fallbacks, timeouts</td><td>agent only echoes the request</td></tr>
+          <tr><td>Guardrails</td><td>budget limits, approval rules, redaction, authz</td><td>ships a $4,200 refund with no review</td></tr>
+          <tr><td>Feedback</td><td>status, audit trail, retries, escalation, user copy</td><td>completed action is never surfaced</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="guide-section">
+    <p class="eyebrow">Run locally</p>
+    <h2>Inspect the evidence</h2>
+    <pre class="code-block">npm start        # serve the lab on :3000
+npm test         # domain model + server + e2e
+npm run check    # both</pre>
+    <p>Pick <strong>Refund an over-limit charge</strong> and run it: the guardrails layer blocks the $4,200 request against the $2,000 limit. Now disable <strong>Guardrails</strong> and run the same task — it completes, and the trace flags the breach that shipped with it.</p>
+  </section>
+
+  <section class="guide-section panel">
+    <p class="eyebrow">Limits</p>
+    <h2>What this demo does not claim</h2>
+    <ul>
+      <li>The simulated tools are deterministic fixtures, not live airline APIs.</li>
+      <li>Real agents mix layers in pipelines, orchestrators, and human handoffs.</li>
+      <li>One missing contract is enough to fail here; in production, failures often overlap multiple layers.</li>
+      <li>A green run means this request passed — it does not prove every request will.</li>
+    </ul>
+    <p><a class="try" href="/">Return to Lab</a></p>
+  </section>
+</main>
+<!-- pb-shell --><a class="pb-shell" href="https://github.com/anhquanbd2021/an-ai-agent-is-not-a-single-prompt-it-is-a" title="an-ai-agent-is-not-a-single-prompt-it-is-a — an Article Playbook demo (view source)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="2" width="9" height="9" rx="2" fill="#5eead4"/><rect x="13" y="2" width="9" height="9" rx="2" fill="#5eead4" opacity=".45"/><rect x="2" y="13" width="9" height="9" rx="2" fill="#5eead4" opacity=".55"/><rect x="13" y="13" width="9" height="9" rx="4.5" fill="#5eead4"/></svg><b>an-ai-agent-is-not-a-single-prompt-it-is-a</b><i>DEMO</i></a><!-- pb-shell --><!-- pb-back --><a class="pb-back" id="pb-back" href="https://github.com/anhquanbd2021/an-ai-agent-is-not-a-single-prompt-it-is-a" title="Back to the article — an-ai-agent-is-not-a-single-prompt-it-is-a">← Article <i>PLAYBOOK</i></a><!-- pb-back -->
+</body>
+</html>
